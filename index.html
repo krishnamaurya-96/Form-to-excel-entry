@@ -1,0 +1,74 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" ></script>
+      <script>
+         $(document).ready(function() {
+             $('#frmSubmit').on('submit', function(e) {
+                 e.preventDefault(); // Prevent the default form submission behavior
+                 var valid = true; // Flag to check overall form validity
+         
+                 // Validate each required input
+                 $('#frmSubmit').find('input[required]').each(function() {
+                     var $this = $(this);
+                     var $errorMessage = $this.next('.error-message'); // Error message span for the corresponding field
+         
+                     if (!$this.val()) {
+                         $errorMessage.text('This field is required.'); // Set text for empty field
+                         $errorMessage.show(); // Show error message
+                         valid = false;
+                     } else {
+                         if ($this.attr('type') === 'email') {
+                             // Specific email validation
+                             var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                             if (!emailRegex.test($this.val())) {
+                                 $errorMessage.text('Please enter a valid email address.');
+                                 $errorMessage.show();
+                                 valid = false;
+                             } else {
+                                 $errorMessage.hide();
+                             }
+                         } else if ($this.attr('name') === 'mobile') {
+                             // Mobile number validation
+                             var mobileNumber = $this.val().replace(/\D/g, ''); // Remove non-numeric characters
+                             if (mobileNumber.length < 10 || mobileNumber.length > 15) {
+                                 $errorMessage.text('Please enter a mobile number with 10 to 15 digits.');
+                                 $errorMessage.show();
+                                 valid = false;
+                             } else {
+                                 $errorMessage.hide();
+                             }
+                         } else {
+                             $errorMessage.hide(); // Hide any previous error message
+                         }
+                     }
+                 });
+         
+                 if (valid) {
+                     // If the form is valid, proceed with the AJAX request
+                     $('#btnSubmit').attr('disabled', true); // Disable the button
+                     console.log("Button clicked"); // Log message to the console
+         
+                     $.ajax({
+                         url: '',
+                         type: 'post',
+                         data: $('#frmSubmit').serialize(),
+                         success: function(result) {
+                             $('#frmSubmit')[0].reset(); // Reset the form
+                             $('#frmSubmit').find('.error-message').hide(); // Hide all error messages
+                             $('#btnSubmit').attr('disabled', false); // Enable the button
+                             $('#btnSubmit').hide(); // Optionally hide the button after successful submission
+                             window.location.href = "thank-you.php"; // Redirect the user to Google.com
+                         }
+                     });
+                 } else {
+                     $('#btnSubmit').attr('disabled', false); // Re-enable the button if form is invalid
+                     $('#msg').text('Please fill all required fields correctly.'); // Show error message
+                 }
+             });
+         
+             // Listener to clear error messages as user starts typing in the input fields
+             $('input').on('input', function() {
+                 var $this = $(this);
+                 $this.next('.error-message').hide(); // Hide error message when the user starts typing
+                 $('#msg').text(''); // Clear global error message
+             });
+         });
+      </script>
